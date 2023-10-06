@@ -1,10 +1,13 @@
 pipeline {
     agent { node { label 'AGENT-1' } }
+    options {
+        ansiColor('xterm')
+    }
 
     stages {
         stage('Init') {
             steps {
-                sh '''
+                sh'''
                     cd 01-vpc
                     ls -ltr
                     pwd
@@ -12,13 +15,30 @@ pipeline {
                 '''
             }
         }
-        stage('plan') {
+        stage('Plan') {
             steps {
-                sh '''
-                    cd 01-vpc
+                sh'''
                     ls -ltr
                     pwd
+                    cd 01-vpc
                     terraform plan
+                '''
+            }
+        }
+        stage('Approve') {
+            steps{
+                input "Shall I apply?"
+            }
+        }
+
+        stage('Apply') {
+            steps{
+                
+                sh '''
+                    pwd
+                    ls -ltr
+                    cd 01-vpc
+                    terraform apply -auto-approve
                 '''
             }
         }
